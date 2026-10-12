@@ -1,114 +1,159 @@
-# Passgen Toolkit 
+# Passgen Toolkit
 
-A lightweight, cryptographically secure Python password generation and validation library built on top of Python's built-in `secrets` module. 
+A lightweight Python library for generating and validating passwords, built on Python's standard `secrets` module (cryptographically secure randomness).
 
-Designed for developers who need secure random integers, compliant random strings, and customizable wrapper passwords.
-
----
+It provides secure random integers, general-purpose password generators, a generator for common website-style rules, wrapper passwords around your own text, and an experimental multilingual generator.
 
 ## Features
 
-- **Secure Random Integers:** `secrandint()` acts as a secure alternative to `random.randint`.
-- **Core Generator:** `gen_pass()` builds robust passwords mixing letters, digits, and symbols.
-- **Compliance Checks:** Validate passwords against robust character rules and checks for compliance with widely accepted regulations (`validate_string()` and `val_pass()`).
-- **Custom password Generator:** `cpasgen()` lets you embed custom strings and numbers into automatically padded secure tokens.
-- **Secure Shuffle**: It implements a robust Fisher-Yates shuffling algorithm to safely mix custom tokens and character sets using `secrandint()`.
-- **Multilingual Unicode Blocks**: It supports global character blocks including Cyrillic, Arabic, Korean, Chinese, Tamil, Hindi, Greek, and more.
+- **Secure random integers**: `secrandint()` is a secure replacement for `random.randint`.
+- **Secure shuffle**: `secure_shuffle()` uses the Fisher-Yates algorithm driven by `secrandint()`.
+- **Core generator**: `gen_pass()` builds passwords from letters, digits and symbols, with optional exact counts of each.
+- **Rule-compliant generator**: `valpasgen()` always satisfies the custom rules checked by `val_pass()`.
+- **Validators**: `validate_string()` and `val_pass()` check which character types a password contains and whether it meets a common website-style rule set.
+- **Custom wrapper passwords**: `cpasgen()` pads your own text and number with random punctuation.
+- **Multilingual passwords (experimental)**: `langpass()` picks letters from many writing systems (Cyrillic, Arabic, Korean, Chinese, Tamil, Hindi, Greek and more).
 
-## Quick-Start Reference Guide
+## Installation
 
-### 1. Core Randomness & Shuffling
+No external dependencies. Requires Python 3.6+ (for `secrets` and f-strings).
 
-* **`secrandint(a, b)`**
-  * **What it does:** Generates a cryptographically secure random integer between `a` and `b` (inclusive).
-  * **Example:**
-    ```python
-    num = secrandint(1, 100)
-    ```
+1. Place `passgen.py` in your project folder.
+2. Import it:
 
-* **`secure_shuffle(text)`**
-  * **What it does:** Randomly shuffles the characters of a string using the Fisher-Yates algorithm using `secrandint()`.
-  * **Example:**
-    ```python
-    shuffled = secure_shuffle("Password123")
-    ```
+```python
+from passgen import *
+# or
+import passgen
+```
 
----
+## Quick-Start Reference
 
-### 2. Password Generators
+### 1. Randomness and shuffling
 
-* **`gen_pass(l=12, d=())`**
-  * **What it does:** Generates a secure password of length `l`. Passing a tuple `(digits, alphabets, specials)` specifies exact composition counts.
-  * **Example:**
-    ```python
-    # Custom composition: 2 digits, 8 letters, 2 specials
-    p = gen_pass(l=12, d=(2, 8, 2))
-    ```
+#### `secrandint(a, b)`
 
-* **`chrgen(l=12)`**
-  * **What it does:** Generates a raw secure random sequence using standard printable ASCII character codes (decimal 33 to 126).
-  * **Example:**
-    ```python
-    raw_ascii = chrgen(16)
-    ```
+Returns a cryptographically secure random integer between `a` and `b` (both inclusive). Raises `ValueError` if `a > b`.
 
-* **`valpassgen(l=12)`**
-  * **What it does:** Continuously generates ASCII strings using the `pass_gen()` framework and passes strictly according to custom standards.
-  * inclusion of 1 space
-  * inclusion of 1 uppercase
-  * inclusion of 1 lowercase
-  * inclusion of 1 special character
-  * minimum of 8 characters
-  * **Example:**
-    ```python
-    nist_pass = Nipasgen(16)
-    ```
+```python
+num = secrandint(1, 100)
+```
 
----
+#### `secure_shuffle(text)`
 
-### 3. Validation Functions
+Returns the characters of `text` in a random order (Fisher-Yates shuffle using `secrandint()`).
 
-* **`validate_string(text)`**
-  * **What it does:** Checks a string and returns a tuple indicating the presence of lowercase letters, digits, and uppercase letters `(lo, di, up)`.
+```python
+shuffled = secure_shuffle("Password123")
+```
 
-* **`val_pass(text)`**
-  * **What it does:** Validates whether a string meets specific custom standards still widely adopted in websites.
-  These include:
-  * inclusion of 1 space
-  * inclusion of 1 uppercase
-  * inclusion of 1 lowercase
-  * inclusion of 1 special character
-  * minimum of 8 characters 
+### 2. Password generators
 
----
+#### `gen_pass(l=12, d=())`
 
-### 4. Custom & Multilingual Generators
+Generates a password of length `l` using letters, digits and symbols.
 
-* **`cpasgen(l, s, n, o=None)`**
-  * **What it does:** Combines user-defined string fragments (`s`), numbers/strings (`n`), and punctuation to create customized password structures. `o` bypasses the user input prompt needed for the different formats as it is predefined by the value of o.
-  * o=1:
-    it refers to the string text to be at the start followed by the special characters and then the custom numbers.
-  * o=2:
-    it refers to completely scramble the secure password created by the above combination.
-  * o=3:
-    it refers the special characters at the start of the text and then followed by the text and numerals    
+Note that in the default mode the password is not guaranteed to contain every character type. For guaranteed composition, pass a tuple `d = (digits, letters, symbols)` with exact counts. When `d` is given, `l` is ignored and the length is the sum of the tuple.
 
-* **`langpass(l, lan:list=None)`**
-  * **What it does:** Generates a high-entropy password combining ASCII prefixes with characters picked randomly from global Unicode language blocks (e.g., Cyrillic, Arabic, Korean, Tamil, Greek, etc.).
-  * **Example:**
-    ```python
-    global_token = langpass(16,['latin','korean','hindi','tamil','chinese'])
-    ```
-    The default value go the lan list is the `Lang_rang` which contains a select language and can be modified to ones choice.
-    `Lang_range = {
+```python
+p1 = gen_pass()                  # 12 random characters
+p2 = gen_pass(16)                # 16 random characters
+p3 = gen_pass(d=(2, 8, 2))       # exactly 2 digits, 8 letters, 2 symbols (length 12)
+```
+
+#### `chrgen(l=12)`
+
+Generates `l` random characters from the printable ASCII range (character codes 33 to 126).
+
+```python
+raw_ascii = chrgen(16)
+```
+
+#### `valpasgen(l=12)`
+
+Generates a password that always satisfies the rules in `val_pass()` below. `l` must be at least 8, otherwise `ValueError` is raised.
+
+```python
+policy_pass = valpasgen(16)
+```
+
+### 3. Validation
+
+#### `validate_string(text)`
+
+Returns a tuple `(has_lowercase, has_digit, has_uppercase)` of booleans.
+
+```python
+validate_string("abcD1")   # (True, True, True)
+```
+
+#### `val_pass(text)`
+
+Returns `True` if the text meets this custom, website-style rule set:
+
+- at least 8 characters
+- at least 1 lowercase letter
+- at least 1 uppercase letter
+- at least 1 digit
+- at least 1 space
+- at least 1 symbol from `! @ # $ % _ -`
+
+> **Note:** This is a common style of website rule, not a NIST recommendation. NIST guidance (SP 800-63B) favors length and checking against breached-password lists over forced character-type rules.
+
+### 4. Custom and multilingual generators
+
+#### `cpasgen(l, s, n, o=None)`
+
+Wraps your own text `s` and number `n` with random punctuation to reach total length `l`. If `o` is omitted, the function asks which mode to use.
+
+| `o` | Result |
+|-----|--------|
+| `1` | `s` + random punctuation + `n` |
+| `2` | all of the above shuffled together |
+| `3` | random punctuation + `s` + `n` |
+| `0` | prints all three versions and returns `None` |
+
+Any other value raises `ValueError`.
+
+```python
+cpasgen(16, "hello", 2024, 2)
+```
+
+> **Warning:** Only the random punctuation is secret. Text and numbers you add (names, birth years) are guessable, so keep `l` much larger than `len(s) + len(n)` and avoid personal information.
+
+#### `langpass(l, lan=None)`
+
+Generates a password of length `l` (minimum 8) made of 2 digits, 1 symbol, and letters picked from the chosen writing systems, all shuffled together. Only real letters are used (unassigned and combining Unicode characters are filtered out).
+
+`lan` is a list of language names from `Lang_range`. If omitted, all languages are used. Unknown names raise `ValueError`.
+
+```python
+global_token = langpass(16, ['latin', 'korean', 'hindi', 'tamil', 'chinese'])
+default_token = langpass(12)
+```
+
+Strength depends on the languages you choose. Many languages give high entropy, while `['latin']` alone gives only the 26 uppercase letters A to Z.
+
+> **Use with caution:**
+> - Many websites reject non-ASCII passwords.
+> - Unicode normalization differences can make the same password fail on another device.
+> - bcrypt only reads the first 72 bytes, and CJK characters take 3 bytes each, so long passwords may be silently truncated.
+> - You will almost certainly need a password manager to enter them.
+
+## Customizing the language list
+
+`Lang_range` maps a language name to a range of Unicode code points:
+
+```python
+Lang_range = {
     "cyrillic": (0x0410, 0x044F),
     "arabic": (0x0621, 0x064A),
     "korean": (0xAC00, 0xD7A3),
     "chinese": (0x4E00, 0x9FA5),
     "latin": (0x0041, 0x005A),
-    'hiragana': (0x3040, 0x309F),
+    "hiragana": (0x3040, 0x309F),
     "thai": (0x0E00, 0x0E7F),
-    "hindi":(0x0900, 0x097F),
+    "hindi": (0x0900, 0x097F),
     "tamil": (0x0B80, 0x0BFF),
     "tibetan": (0x0F00, 0x0FFF),
     "sinhala": (0x0D80, 0x0DFF),
@@ -117,16 +162,12 @@ Designed for developers who need secure random integers, compliant random string
     "telugu": (0x0C00, 0x0C7F),
     "gujarati": (0x0A80, 0x0AFF),
     "punjabi": (0x0A00, 0x0A7F),
-    "greek": (0x0370, 0x03FF)
-}`
----
+    "greek": (0x0370, 0x03FF),
+}
+```
+
+To add or remove languages, edit this dictionary **in `passgen.py`**. The `POOLS` table (the letters actually used) is built from it when the module loads, so adding an entry to `Lang_range` at runtime will cause a `KeyError`.
+
 ## Disclaimer
 
-This software is provided "as is", without warranty of any kind. While `passgen` uses cryptographically secure pseudo-random number generators (`secrets`), security is a system-wide practice. 
-The authors are not responsible for any compromised accounts, data breaches, or security vulnerabilities resulting from the use of this library.
-Always ensure proper password hashing (e.g., Argon2, bcrypt), secure transmission (HTTPS), and safe storage practices in your applications.
-
-## Installation
-
-To use this module in your project, simply place `passgen.py` in your project directory and import it
-**Requirements:** It has **no external dependencies** and is a lightweight module.
+This software is provided "as is", without warranty of any kind. Although Passgen uses the cryptographically secure `secrets` module, security is a system-wide practice. The authors are not responsible for compromised accounts, data breaches, or security vulnerabilities resulting from its use. Always use proper password hashing (for example Argon2 or bcrypt), secure transmission (HTTPS) and safe storage, and avoid reusing passwords across sites.
