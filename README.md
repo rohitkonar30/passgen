@@ -1,5 +1,5 @@
 # Passgen Toolkit
-
+![CI](https://github.com/rohitkonar30/passgen/actions/workflows/ci.yml/badge.svg)
 A lightweight Python library for generating and validating passwords, built on Python's standard `secrets` module (cryptographically secure randomness).
 
 It provides secure random integers, general-purpose password generators, a generator for common website-style rules, wrapper passwords around your own text, and an experimental multilingual generator.
