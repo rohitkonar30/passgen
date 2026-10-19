@@ -1,5 +1,6 @@
 import secrets,string,unicodedata
-
+   __all__ = ["secrandint", "secure_shuffle", "gen_pass", "chrgen", "valpasgen",
+              "validate_string", "val_pass", "cpasgen", "langpass", "Lang_range"]
 
 #This function is the secure version of randint 
 #Also note the default length of the password generation is chosen as 12 but feel free to change and explore around
@@ -7,7 +8,7 @@ l=12 #default length
 def secrandint(a,b):
     ''' This is analogous to randint function and does it securely using secure.randbelow'''
     if a>b:
-        raise ValueError
+        raise ValueError("a must be less than or equal to b")
     return a+secrets.randbelow(b-a+1)
 def secure_shuffle(text: str) -> str:
     """Shuffles a string securely using the Fisher-Yates algorithm and secrandint."""
@@ -20,7 +21,7 @@ def secure_shuffle(text: str) -> str:
     return "".join(char_list)
 
 def gen_pass(l=12,d:tuple=()):
-    '''This Function is the crux of the password generator and while passing tuple ensure (no of digits,no of alpghabets and no of special characters)'''
+    '''This Function is the crux of the password generator and while passing tuple ensure (no of digits,no of alphabets and no of special characters)'''
     p=""
     alpha=string.ascii_letters
     digits="0123456789"
@@ -47,7 +48,7 @@ def validate_string(text:str):
     up = any(char in string.ascii_uppercase for char in text)
     di = any(char in string.digits for char in text)
     return (lo,di,up)
-#validates according to NIST stds 
+#validates according to Custom  stds present in the docstring given below
 def val_pass(text:str):
     '''validates password provided according to custom standards '''
     '''
@@ -76,7 +77,7 @@ def valpasgen(l=12):
     '''This password generator is custom password compliant'''
 #using gen_pass() framework
     if l < 8:
-        raise ValueError("Password length must be at least 8 to meet customm criteria.")    
+        raise ValueError("Password length must be at least 8 to meet custom criteria.")    
     p=" "
     while True:
         p=" " + gen_pass(l-5)+secrets.choice(string.ascii_lowercase)+secrets.choice(string.ascii_uppercase)+secrets.choice(string.digits)+secrets.choice("!@#$%_-")
