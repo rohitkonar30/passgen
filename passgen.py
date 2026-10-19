@@ -1,5 +1,5 @@
 import secrets,string,unicodedata
-   __all__ = ["secrandint", "secure_shuffle", "gen_pass", "chrgen", "valpasgen",
+__all__ = ["secrandint", "secure_shuffle", "gen_pass", "chrgen", "valpasgen",
               "validate_string", "val_pass", "cpasgen", "langpass", "Lang_range"]
 
 #This function is the secure version of randint 
