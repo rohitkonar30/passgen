@@ -74,20 +74,20 @@ def chrgen(l=12):
         p+=chr(secrandint(33,126))
     return p    
  def valpasgen(l=12):
- '''This password generator is custom password compliant'''
- if l < 8:
-     raise ValueError("Password length must be at least 8 to meet custom criteria.")
- while True:
-     rest = (gen_pass(l-5)
-             + secrets.choice(string.ascii_lowercase)
-             + secrets.choice(string.ascii_uppercase)
-             + secrets.choice(string.digits)
-             + secrets.choice("!@#$%_-"))
-     rest = secure_shuffle(rest)
-     i = secrandint(1, len(rest) - 1)   # interior position only
-     p = rest[:i] + " " + rest[i:]
-     if val_pass(p):
-         return p
+   '''This password generator is custom password compliant'''
+   if l < 8:
+       raise ValueError("Password length must be at least 8 to meet custom criteria.")
+   while True:
+       rest = (gen_pass(l-5)
+               + secrets.choice(string.ascii_lowercase)
+               + secrets.choice(string.ascii_uppercase)
+               + secrets.choice(string.digits)
+               + secrets.choice("!@#$%_-"))
+       rest = secure_shuffle(rest)
+       i = secrandint(1, len(rest) - 1)   # interior position only
+       p = rest[:i] + " " + rest[i:]
+       if val_pass(p):
+           return p
 def cpasgen(l:int,s:str,n:int,o=None):
     """ 
     Creates custom passwords based on user inputs.
